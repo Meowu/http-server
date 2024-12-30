@@ -1,2 +1,2 @@
 [workspace]
-members = ["simple"]
+members = ["simple", "threaded"]
