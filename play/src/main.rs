@@ -1,4 +1,4 @@
-use std::sync::mpsc;
+use std::sync::{mpsc, Arc, Mutex};
 use std::thread;
 use std::time::Duration;
 
@@ -40,22 +40,44 @@ fn main() {
     // let reveiced = reveiver.recv().unwrap();
     // println!("Greet from sub thread: {}", reveiced);
 
-    // ===== More messages between channel.
-    let (sender, receiver) = mpsc::channel();
+    // ===== 4. More messages between channel.
+    // let (sender, receiver) = mpsc::channel();
 
-    thread::spawn(move || {
-        let messages = vec!["Hello ", "World! ", "I am from sub thread."];
+    // thread::spawn(move || {
+    //     let messages = vec!["Hello ", "World! ", "I am from sub thread."];
 
-        for message in messages {
-            sender.send(message.to_string()).unwrap();
-        }
-    });
+    //     for message in messages {
+    //         sender.send(message.to_string()).unwrap();
+    //     }
+    // });
 
-    let mut contents = String::new();
+    // let mut contents = String::new();
 
-    for received in receiver {
-        contents.push_str(&received);
+    // for received in receiver {
+    //     contents.push_str(&received);
+    // }
+
+    // println!("Received from sub thread: {}", contents);
+
+    // ===== 5. Shared Data Between threads
+    let counter = Arc::new(Mutex::new(0));
+    let mut handles = vec![];
+
+    for _ in 0..5 {
+        // clone arc for each thread
+        let cloned_counter = Arc::clone(&counter);
+
+        let handle = thread::spawn(move || {
+            let mut num = cloned_counter.lock().unwrap();
+            *num += 1;
+        });
+        handles.push(handle);
     }
 
-    println!("Received from sub thread: {}", contents);
+    println!("Waiting for the threads to run...");
+    for handle in handles {
+        handle.join().unwrap();
+    }
+
+    println!("Final counter result: {}", *counter.lock().unwrap());
 }
