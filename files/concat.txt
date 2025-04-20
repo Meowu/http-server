@@ -1,0 +1,12 @@
+===== files/file2.txt =====
+这是第二个文件的内容
+===== file end =====
+
+===== files/file1.txt =====
+这是第一个文件的内容
+===== file end =====
+
+===== files/file3.txt =====
+这是第三个文件的内容
+===== file end =====
+
