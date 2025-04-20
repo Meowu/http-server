@@ -60,6 +60,9 @@ fn main() {
     // println!("Received from sub thread: {}", contents);
 
     // ===== 5. Shared Data Between threads
+
+    // Arc = 原子引用计数（用于在线程间安全共享）
+    // Mutex = 互斥锁（确保一次只有一个线程可以访问数据）
     let counter = Arc::new(Mutex::new(0));
     let mut handles = vec![];
 
@@ -70,11 +73,13 @@ fn main() {
         let handle = thread::spawn(move || {
             let mut num = cloned_counter.lock().unwrap();
             *num += 1;
+            // 离开作用域时自动释放锁
         });
+        // if we handle.join here, it will wait for it to complete.
         handles.push(handle);
     }
 
-    println!("Waiting for the threads to run...");
+    println!("Waiting for all the threads to complete...");
     for handle in handles {
         handle.join().unwrap();
     }
